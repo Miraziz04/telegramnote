@@ -1,0 +1,531 @@
+supAPI = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkaWtndGl5d21haWJpbG1qZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NzU0NDYsImV4cCI6MjA3MjQ1MTQ0Nn0.Fc4hogci1C3VaYTZyj96ceLnLQUzQa3JLJhhZB13-ak'
+supabaseUrl = 'https://hdikgtiywmaibilmjgjl.supabase.co'
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>document</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --panel: #111420;
+      --muted: #96a0b2;
+      --accent: #ff4c4c;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(180deg, #3b67ba, #0749ff);
+      color: #e6eef8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px
+    }
+
+    .wrap {
+      width: 720px;
+      max-width: calc(100% - 48px);
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--panel), #88b7f0);
+      border: 1px solid rgba(255, 255, 255, .03);
+      box-shadow: 0 12px 40px rgba(2, 6, 23, .6)
+    }
+
+    .head {
+      padding: 14px 18px;
+      font-weight: 700;
+      text-align: center
+    }
+
+    .body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block
+    }
+
+    input[type=text],
+    input[type=email] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, .03);
+      background: #0d1622;
+      color: #eaf6ff;
+      outline: none;
+      font-size: 14px
+    }
+
+    .btn {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(90deg, var(--accent), #b30000);
+      color: #fff;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, .04);
+      color: var(--muted)
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .hidden {
+      display: none
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .02)
+    }
+
+    .messages {
+      flex: 1;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .01), transparent)
+    }
+
+    .msg {
+      max-width: 78%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .03);
+      color: #e8f3ff;
+      font-size: 14px;
+      word-break: break-word;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, .45);
+      position: relative
+    }
+
+    .msg img,
+    .msg video {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 6px;
+      cursor: pointer
+    }
+
+    .me {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #ff4c4c, #b30000);
+      color: #02220f;
+      border-bottom-right-radius: 4px
+    }
+
+    .other {
+      align-self: flex-start;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #04263b;
+      border-bottom-left-radius: 4px
+    }
+
+    .composer {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      gap: 8px;
+      background: rgba(255, 255, 255, .01);
+      border-top: 1px solid rgba(255, 255, 255, .02);
+      position: relative
+    }
+
+    .composer input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .03);
+      background: #071226;
+      color: #fff
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .btn.recording {
+      background: linear-gradient(90deg, #ef4444, #f97316) !important;
+      transform: scale(1.02)
+    }
+
+    .who {
+      font-size: 12px;
+      opacity: .85;
+      margin-bottom: 6px
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 14px
+    }
+
+    
+    .img-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .img-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap" role="application" aria-label="Chat app">
+    <div class="head">Общий чат</div>
+
+    <div class="body" id="panel-login">
+      <div><label for="nick">Ник</label><input id="nick" type="text" placeholder="Alex"></div>
+      <div><label for="email">Email</label><input id="email" type="email" placeholder="you@example.com"></div>
+      <div style="display:flex;gap:8px"><button id="enterBtn" class="btn">Войти</button><button id="clearBtn"
+          class="btn ghost">Очистить</button></div>
+      <div class="small center">Просто введите ник и email — чат откроется</div>
+    </div>
+
+    <div class="body hidden" id="panel-chat">
+      <div class="small center">Вы вошли как <strong id="meLabel"></strong></div>
+      <div class="chat">
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <div class="composer">
+          <input id="msgInput" type="text" placeholder="Напишите сообщение..." autocomplete="off">
+          <input id="fileInput" type="file" class="file-input" accept="image/*,video/*,audio/*">
+          <button id="fileBtn" class="btn" title="Прикрепить"><i class="fa-solid fa-paperclip"></i></button>
+          <button id="micBtn" class="btn" title="Голосовой"><i class="fa-solid fa-microphone"></i></button>
+          <button id="sendBtn" class="btn" title="Отправить"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="logoutBtn" class="btn ghost">Выйти</button>
+        <div style="flex:1" class="small" id="status"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="imgModal" class="img-modal" onclick="closeModal()">
+    <img id="modalImg" src="">
+  </div>
+
+ <script src="./script.js"></script>
+</body>
+
+</html>
+ const KEY_MESSAGES = 'chat_messages_v1';
+    const KEY_NICK = 'chat_nick_v1';
+    const KEY_EMAIL = 'chat_email_v1';
+    const KEY_MIC_OK = 'chat_mic_ok_v1';
+
+    const panelLogin = document.getElementById('panel-login');
+    const panelChat = document.getElementById('panel-chat');
+    const enterBtn = document.getElementById('enterBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const meLabel = document.getElementById('meLabel');
+    const messagesEl = document.getElementById('messages');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const micBtn = document.getElementById('micBtn');
+    const fileBtn = document.getElementById('fileBtn');
+    const fileInput = document.getElementById('fileInput');
+    const statusEl = document.getElementById('status');
+
+    let currentNick = null;
+    let currentEmail = null;
+    let messages = [];
+    let micStream = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    function showLogin(show) {
+      panelLogin.classList.toggle('hidden', !show);
+      panelChat.classList.toggle('hidden', show);
+    }
+    function saveMessages() {
+      localStorage.setItem(KEY_MESSAGES, JSON.stringify(messages));
+    }
+    function loadMessagesFromStorage() {
+      messages = JSON.parse(localStorage.getItem(KEY_MESSAGES) || '[]');
+    }
+    function renderAll() {
+      messagesEl.innerHTML = '';
+      messages.forEach(renderMessage);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+
+    function openModal(src) {
+      document.getElementById("modalImg").src = src;
+      document.getElementById("imgModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("imgModal").style.display = "none";
+      document.getElementById("modalImg").src = "";
+    }
+
+    
+    function renderMessage(m) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + (m.user === currentNick ? 'me' : 'other');
+      div.dataset.id = m.id;
+
+      const who = document.createElement('div');
+      who.className = 'who';
+      who.textContent = (m.user || 'User') + (m.created_at ? ' • ' + new Date(m.created_at).toLocaleTimeString() : '');
+
+      const body = document.createElement('div');
+      if (m.isMedia) {
+        if (m.mediaType && m.mediaType.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.src = m.dataUrl;
+          img.onclick = () => openModal(img.src);
+          body.appendChild(img);
+        } else if (m.mediaType && m.mediaType.startsWith('video/')) {
+          const v = document.createElement('video');
+          v.src = m.dataUrl;
+          v.controls = true;
+          body.appendChild(v);
+        } else if (m.mediaType && m.mediaType.startsWith('audio/')) {
+          const a = document.createElement('audio');
+          a.src = m.dataUrl;
+          a.controls = true;
+          body.appendChild(a);
+        } else {
+          const a = document.createElement('a');
+          a.href = m.dataUrl;
+          a.target = '_blank';
+          a.textContent = 'Файл';
+          body.appendChild(a);
+        }
+      } else {
+        body.textContent = m.text || '';
+      }
+
+    
+      if (m.user === currentNick) {
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        delBtn.onclick = () => deleteMessage(m.id);
+        div.appendChild(delBtn);
+      }
+
+      div.appendChild(who);
+      div.appendChild(body);
+      messagesEl.appendChild(div);
+    }
+    function deleteMessage(id) {
+      const el = document.querySelector(`.msg[data-id="${id}"]`);
+      if (el) el.remove();
+      messages = messages.filter(m => String(m.id) !== String(id));
+      saveMessages();
+    }
+
+    function pushMessage(obj) {
+      messages.push(obj);
+      saveMessages();
+      renderMessage(obj);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    enterBtn.addEventListener('click', () => {
+      const nick = document.getElementById('nick').value.trim();
+      const email = document.getElementById('email').value.trim();
+      if (!nick || !email) {
+        alert('Введите ник и email');
+        return;
+      }
+      currentNick = nick;
+      currentEmail = email;
+      localStorage.setItem(KEY_NICK, currentNick);
+      localStorage.setItem(KEY_EMAIL, currentEmail);
+      meLabel.textContent = currentNick + ' · ' + currentEmail;
+      showLogin(false);
+      loadMessagesFromStorage();
+      renderAll();
+      askMicOnce();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      document.getElementById('nick').value = '';
+      document.getElementById('email').value = '';
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(KEY_NICK);
+      localStorage.removeItem(KEY_EMAIL);
+      currentNick = null;
+      currentEmail = null;
+      showLogin(true);
+    });
+
+    sendBtn.addEventListener('click', () => {
+      const t = msgInput.value.trim();
+      if (!t) return;
+      const obj = { id: Date.now(), user: currentNick, text: t, isMedia: false, created_at: new Date().toISOString() };
+      pushMessage(obj);
+      msgInput.value = '';
+    });
+    msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
+
+    fileBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        const obj = { id: Date.now(), user: currentNick, isMedia: true, mediaType: f.type, dataUrl, created_at: new Date().toISOString() };
+        pushMessage(obj);
+      };
+      reader.readAsDataURL(f);
+      fileInput.value = '';
+    });
+
+    async function saveToSupabase(msg) {
+  try {
+    const { data, error } = await fetch(`${supabaseUrl}/rest/v1/xabar`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': supAPI,
+        'Authorization': 'Bearer ' + supAPI,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        id: msg.id,
+        create: msg.created_at,
+        msg: msg.text || null,
+        user: msg.user
+      })
+    }).then(r => r.json());
+
+    if (error) console.error("Supabase error:", error);
+  } catch (e) {
+    console.error("Save error:", e);
+  }
+}
+
+
+    async function askMicOnce() {
+      if (localStorage.getItem(KEY_MIC_OK) === '1') {
+        try { micStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { }
+        return;
+      }
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        localStorage.setItem(KEY_MIC_OK, '1');
+      } catch (e) { console.warn('mic not allowed on first ask', e); }
+    }
+
+    function startRecording() {
+      if (!micStream) {
+        alert('Нет разрешения на микрофон.');
+        return;
+      }
+      function pushMessage(obj) {
+  messages.push(obj);
+  saveMessages();
+  renderMessage(obj);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  
+  saveToSupabase(obj);
+}
+
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(micStream);
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const fr = new FileReader();
+        fr.onload = () => {
+          const dataUrl = fr.result;
+          const obj = { id: Date.now(), user: currentNick, isMedia: true, mediaType: blob.type || 'audio/webm', dataUrl, created_at: new Date().toISOString() };
+          pushMessage(obj);
+        };
+        fr.readAsDataURL(blob);
+      };
+      mediaRecorder.start();
+      isRecording = true;
+      micBtn.classList.add('recording');
+    }
+
+    
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      isRecording = false;
+      micBtn.classList.remove('recording');
+    }
+
+    micBtn.addEventListener('click', async () => {
+      if (!micStream) {
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          localStorage.setItem(KEY_MIC_OK, '1');
+        } catch (e) { alert('Доступ к микрофону не получен'); return; }
+      }
+      if (!isRecording) startRecording(); else stopRecording();
+    });
+
+    window.addEventListener('load', () => {
+      const savedNick = localStorage.getItem(KEY_NICK);
+      const savedEmail = localStorage.getItem(KEY_EMAIL);
+      if (savedNick) document.getElementById('nick').value = savedNick;
+      if (savedEmail) document.getElementById('email').value = savedEmail;
+      if (savedNick && savedEmail) {
+        currentNick = savedNick; currentEmail = savedEmail;
+        meLabel.textContent = currentNick + ' · ' + currentEmail;
+        showLogin(false);
+        loadMessagesFromStorage();
+        renderAll();
+        askMicOnce();
+      }
+    });
